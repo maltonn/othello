@@ -1,0 +1,77 @@
+html, body {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  background-color: #ddd;
+}
+
+div {
+  margin: 0;
+}
+
+body > h1 {
+  width: 100%;
+  text-align: center;
+  margin: 16px;
+}
+
+#notification {
+  position: absolute;
+  width: 100%;
+  height: 10%;
+  bottom: 0;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#notification p {
+  position: absolute;
+  color: white;
+  font-size: 1.5rem;
+}
+
+#board_grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 10%;
+  margin: auto;
+  width: min(95vmin, 80vh, 800px);
+  height: min(95vmin, 80vh, 800px);
+  border-top: 2px solid black;
+  border-left: 2px solid black;
+  background-color: yellowgreen;
+}
+#board_grid .row {
+  box-sizing: border-box;
+  border-bottom: 2px solid black;
+  width: min(95vmin, 80vh, 800px);
+  height: calc( min(95vmin, 80vh, 800px) / 8 );
+  display: flex;
+}
+#board_grid .row .cell {
+  border-right: 2px solid black;
+  width: calc( min(95vmin, 80vh, 800px) / 8 );
+  height: calc( min(95vmin, 80vh, 800px) / 8 );
+  cursor: pointer;
+}
+#board_grid .row .cell .stone {
+  margin: 5%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+}
+#board_grid .row .cell .stone.black {
+  background-color: black;
+}
+#board_grid .row .cell .stone.white {
+  box-sizing: border-box;
+  background-color: white;
+  border: 3px solid black;
+}
+
+/*# sourceMappingURL=style.css.map */
