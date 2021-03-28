@@ -1,0 +1,4 @@
+numpy
+flask
+random
+tensorflow
