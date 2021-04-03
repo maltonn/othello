@@ -13,7 +13,7 @@ for (i=0;i<length;i++){
         
         stone=document.createElement('div')
         stone.classList.add('stone')
-        stone.id='cell-'+i+'-'+j
+        stone.id='stone-'+i+'-'+j
 
         cell.appendChild(stone)
         cell.addEventListener('click',function(){
@@ -31,7 +31,6 @@ for (i=0;i<length;i++){
 
 //initialize
 var board=[]
-var valid_board=[]
 var now_playing=0
 
 for(i=0;i<length;i++){
@@ -42,15 +41,19 @@ for(i=0;i<length;i++){
     board.push(tmp)
 }
 
+
 tmp_func=(x,y,player)=>{
     board[y][x][player]=1
-    document.getElementById('cell-'+y+'-'+x).classList.add(stone_color[player])
+    document.getElementById('stone-'+y+'-'+x).classList.add(stone_color[player])
 }
 tmp_func(length/2-1,length/2-1,1)
 tmp_func(length/2,length/2,1)
 tmp_func(length/2-1,length/2,0)
 tmp_func(length/2,length/2-1,0)
 
+if (now_playing==1){
+    Send('/ai', {'b':Board2Str(board)}, callback)
+}
 
 //put stone
 function Put(x,y,player){
@@ -58,9 +61,11 @@ function Put(x,y,player){
     y=Number(y)
 
     if (now_playing!=player){
+        Notify('AIが考えてます。ちょっと待ってね')
         return false
     }
-    if (board[y][x][1-player]){
+    if (board[y][x][1-player] || board[y][x][1-player]){
+        Notify('そこには置けません。')
         return false
     }
 
@@ -91,7 +96,7 @@ function Put(x,y,player){
                 }
 
                 board[y][x][player]=1
-                document.getElementById('cell-'+y+'-'+x).classList.add(stone_color[player])
+                document.getElementById('stone-'+y+'-'+x).classList.add(stone_color[player])
                 Reverse(x,y,nowx,nowy,dx,dy,player)
                 is_valid_action=true
                 break
@@ -101,30 +106,61 @@ function Put(x,y,player){
     if (is_valid_action){
         if (now_playing==me){
             Notify('AI思考中...')
-            Send('/ai', {'b':Board2Str(board)}, callback)
+            f3()
+            function f3(){//裏返している間は、boardが更新されきっていないので、更新されるまでしばらく待つ
+                if(now_reversing){
+                    setTimeout(()=>{
+                        f3()
+                    },200)
+                }else{
+                    Send('/ai', {'b':Board2Str(board)}, callback)
+                }
+            }
         }else{
             Notify('あなたの番です')
         }
         now_playing=1-now_playing
         return true
     }else{
+        Notify('そこには置けません。\n（あなたは'+(player?'白':'黒')+'番です）')
         return false
     }
 }
+
+now_reversing=0
 function Reverse(x1,y1,x2,y2,dx,dy,player){
-    nowx=x1
-    nowy=y1
-    while(true){
+    now_reversing++
+    console.log({player,x1,y1,x2,y2,dx,dy})
+    nowx=Number(x1)
+    nowy=Number(y1)
+    f(nowx,nowy)
+    
+
+    function f(nowx,nowy){
         nowx+=dx
         nowy+=dy
         if (nowx==x2 && nowy==y2){
+            now_reversing--
             return
         }
         board[nowy][nowx][player]=1
         board[nowy][nowx][1-player]=0
-        document.getElementById('cell-'+nowy+'-'+nowx).classList.remove(stone_color[1-player])
-        document.getElementById('cell-'+nowy+'-'+nowx).classList.add(stone_color[player])
+        stone=document.getElementById('stone-'+nowy+'-'+nowx)
+        stone.style.transform=stone.style.transform.includes('180')?'rotateX(0) rotateY(0)':'rotateX(180deg) rotateY(180deg)'
+        f2(stone)
+
+        setTimeout(()=>{
+            f(nowx,nowy)
+        },100)
     }
+
+    function f2(stone){
+        setTimeout(()=>{
+            stone.classList.remove(stone_color[1-player])
+            stone.classList.add(stone_color[player])
+        },100)
+    }
+    
 }
 
 function Notify(str,mode){
@@ -157,18 +193,54 @@ function callback(dic){
         y=(tmp-x)/8
         Put(x,y,1-me)
     }else if(dic['msg']=='pass'){
-        Notify('Pass - あなたの番です。')
+        Notify('AIは何もできません。 \n あなたの番です。')
+        now_playing=me
     }else if(dic['msg']=='done'){
         End()
     }else{
         console.warn('unexpected msg'+dic['msg'])
     }
+
+    if(dic['userpass']){
+        Notify('パスするしかなさそうです。\n AIの番になります。')
+        now_playing=1-me
+        setTimeout(()=>{
+            Send('/ai', {'b':Board2Str(board)}, callback)
+        },1000)
+    }
 }
 
 function End(){
-    //終了処理
+    user_stone=0
+    cpu_stone=0
+    for(i=0;i<8;i++){
+        for(j=0;j<8;j++){
+            if(board[i][j][me]){
+                user_stone++
+            }else if(board[i][j][1-me]){
+                cpu_stone++
+            }
+        }
+    }
+    if (user_stone!=cpu_stone){
+        Notify('試合終了！\n'+user_stone+':'+cpu_stone+'で、あなたの'+(user_stone>cpu_stone?'勝ち':'負け')+'です')
+    }else{
+        window.alert('試合終了！\n引き分けです')
+    }
 }
 
-
-//TODO : ユーザー側で手がなくなった場合。
-//         アニメーション
+/*
+stones=document.getElementsByClassName('stone')
+L=[]
+console.log(stones.length)
+for(i=0;i<stones.length;i++){
+    stones[i].addEventListener('click',function(){
+        id=this.id
+        this.style.backgroundColor='red'
+        y=Number(id.split('-')[1])
+        x=Number(id.split('-')[2])
+        L.push(y*8+x)
+        console.log(L)
+    })
+}
+*/

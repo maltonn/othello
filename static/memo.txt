@@ -1,2 +1,1 @@
-cd C:\Users\ymats\Documents\Desktop\Develop\ML\強化学習\Othello\client\static
 sass --watch scss/style.scss:css/style.css --style expanded --watch
