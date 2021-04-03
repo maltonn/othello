@@ -145,7 +145,7 @@ def Algo(board,valid_board,player):
     if stone_count>=57:
         hand,result=dfs(0,board,valid_board,player,player)
     else:
-        hand,reward=dfs2(0,4,board,valid_board,player,player)
+        hand,reward=dfs2(0,3,board,valid_board,player,player)
         #othello.Show(board)
         #print('reward:',reward)
 
