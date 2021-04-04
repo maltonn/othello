@@ -1,3 +1,5 @@
+import joblib
+
 from agent import Algo
 import numpy as np
 
@@ -169,11 +171,11 @@ def RandomDecide(valid_board):
             return y*8+x
 
 
-def play(game_no,show_print):
+def play(game_no):
     me=0
     B=Board(8)
     while not B.done:
-        if show_print:print('player:',B.now_player)
+        #print('player:',B.now_player)
         
         if B.now_player==me:
             res=Algo(B.board,B.valid_board,me)
@@ -181,22 +183,20 @@ def play(game_no,show_print):
             res=RandomDecide(B.valid_board)
         B.Put(res%8,res//8)
         
-        if show_print:B.Show()
-        
-        if show_print:print('---------------------\n\n\n')
-        print('\r','game{} : {}'.format(game_no,'|'+'#'*(B.stone_count)+' '*(64-B.stone_count))+'|',end="") #ゲージの初期値が4/60だが気にしない
+        #B.Show()
+        #print('---------------------\n\n\n')
+
+        #print('\r','game{} : {}'.format(game_no,'|'+'#'*(B.stone_count)+' '*(64-B.stone_count))+'|',end="") #ゲージの初期値が4/60だが気にしない
 
     my_stone=np.sum(B.board[:,:,me])
     opp_stone=np.sum(B.board[:,:,1-me])
 
-    print('\r game{} : me:{} opp:{} {}'.format(game_no,my_stone,opp_stone,'win' if my_stone>opp_stone else 'lose' if my_stone<opp_stone else 'tie'),end="")
+    #print('\r game{} : me:{} opp:{} {}'.format(game_no,my_stone,opp_stone,'win' if my_stone>opp_stone else 'lose' if my_stone<opp_stone else 'tie'),end="")
 
     return my_stone>opp_stone
 
-if __name__ == '__main__':
-    w=0
-    for i in range(1000):
-        w+=play(i,False)
-        print(' ({:.2f})'.format(w/(i+1)*100),end=' '*100+'\n')
 
-    print('勝率{:.2f}%'.format(w/(i+1)*100))
+if __name__ == '__main__':
+    n=100
+    result = joblib.Parallel(n_jobs=-3,verbose=10)(joblib.delayed(play)(i) for i in range(n))
+    print('勝率{:.2f}%'.format(sum(result)/n*100))

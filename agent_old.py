@@ -37,7 +37,8 @@ def dfs(depth,board,valid_board,player,me):
         #depth=0の時は常にvalid=True（関数の外で判定済み）
     
     else:
-        results=[]
+        result_mx=-2
+        result_mn=2
         hand=-1
 
         for i in range(64):
@@ -51,53 +52,23 @@ def dfs(depth,board,valid_board,player,me):
             result=dfs(depth+1,next_board,None,1-player,me)
 
             if player==me:#お互いに最善手を尽くすと仮定
-                results.append(result)
+                result_mx=max(result,result_mx)
                 hand=i
+            else:
+                result_mn=min(result,result_mn)
+                # player!=me → depth!=0 → handの情報が必要になることはない
                         
         if depth==0:
-            return hand,max(results)
+            return hand,result_mx
         else:            
             if player==me:
-                return max(results)
+                return result_mx
             else:
-                return min(results)+0.01*mean(results) #相手が最適に打つと全部-1になる場合、うっかりミスする確率を一緒に考えたい
+                return result_mn
 
 def dfs2(depth,max_depth,board,valid_board,player,me):
-    if depth==max_depth:
-        reward=0
-        for i in range(64):
-            x=i%8
-            y=i//8
-            if board[y,x,me]:
-                reward+=prs[i]
-            elif board[y,x,1-me]:
-                reward-=prs[i]
-
-        #確定石の計算
-        certain_board=np.zeros_like(board)
-        for rot_num in range(4):
-            board_rot=np.rot90(board,rot_num)
-            certain_board_rot=np.rot90(certain_board,rot_num)
-            for h in range(8):
-                for t in range(h+1):
-                    for p in (me,1-me):
-                        if not board_rot[h-t,t,p]:
-                            continue
-                        if (h-t-1<0 or certain_board_rot[h-t-1,t,p]) and (t-1<0 or certain_board_rot[h-t,t-1,p]) and (h-t-1<0 or t-1<0 or certain_board_rot[h-t-1,t-1,p]):
-                            certain_board_rot[h-t,t,p]=1
-        
-        for i in range(64):
-            x=i%8
-            y=i//8
-            if certain_board[y,x,me]:
-                reward+=5
-            elif certain_board[y,x,1-me]:
-                reward-=5
-        
-        return reward
-
     if depth!=0:#valid_boardが存在するのは初めの１回だけ
-        valid,sv,valid_board=othello.CheckValid(board,player)
+        valid,sv,valid_board=othello.CheckValid(board,1-player)
     else:
         valid=True
         sv=True
@@ -119,7 +90,13 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
     else:
         if depth==0:
             hands=[]
+        
         rewards=[]
+        
+        if player==me:
+            v=1
+        else:
+            v=-1
 
         if np.sum(valid_board)>=16:
             max_depth=3
@@ -129,9 +106,12 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
             x=i%8
             if not valid_board[y,x]:
                 continue
-
-            next_board=othello.Put(x,y,board,player)
-            reward=dfs2(depth+1,max_depth,next_board,None,1-player,me)
+            
+            if depth<max_depth:
+                next_board=othello.Put(x,y,board,player)
+                reward=0.5*dfs2(depth+1,max_depth,next_board,None,1-player,me)+prs[i]*v
+            else:
+                reward=prs[i]*v
 
             if depth==0:
                 hands.append(i)
@@ -139,18 +119,19 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
             rewards.append(reward)
     
     if depth==0:#-> player==me
-        return hands[argmax(rewards)],max(rewards)
+        return hands[argmax(rewards)],max(rewards)+0.3*len(rewards)
 
+    c=len(rewards)
     if player==me:
-        return max(rewards)
+        return max(rewards) + ((3*c-9)/(2*c+2)) if depth>=max_depth-1 else 0
     else:
-        return min(rewards) #0.8*min(rewards)+0.2*mean(rewards)
+        return 0.9*min(rewards)+0.1*mean(rewards) - ((3*c-9)/(4*c+4)) if depth>=max_depth-1 else 0 #「最適解を選んだ時の報酬」と「適当に選んだ時の期待値」の平均 #相手の打てる手が少ないほうが良い(?)
 
 pos_rewards={
-        3:[0, 7, 63, 56],#角
-        1:[18, 21, 45, 42]+[2, 5, 23, 47, 61, 58, 40, 16]+[13, 22, 46, 53, 50, 41, 17, 10]+[59, 60, 39, 31, 4, 3, 24, 32],
-        0:[11, 12, 25, 33, 30, 38, 51, 52]+[19, 20, 29, 37, 44, 43, 34, 26],
-        -1:[49, 54, 14, 9]+[55, 62, 57, 48, 8, 1, 6, 15],
+            3:[0, 7, 63, 56],#角
+            1:[18, 21, 45, 42]+[2, 5, 23, 47, 61, 58, 40, 16]+[13, 22, 46, 53, 50, 41, 17, 10]+[59, 60, 39, 31, 4, 3, 24, 32],
+            0:[11, 12, 25, 33, 30, 38, 51, 52]+[19, 20, 29, 37, 44, 43, 34, 26],
+            -1:[49, 54, 14, 9]+[55, 62, 57, 48, 8, 1, 6, 15],
 }
 
 prs=[0]*64
