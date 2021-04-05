@@ -4,7 +4,7 @@ from flask import *
 app = Flask(__name__)
 
 import othello
-import agent
+import agent_algo
 
 @app.route('/start')
 def just_call():
