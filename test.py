@@ -197,8 +197,7 @@ def play(game_no):
 
 
 if __name__ == '__main__':
-    play(-1)
-    exit()
+    #play(-1)
     n=500
     result = joblib.Parallel(n_jobs=-3,verbose=10)(joblib.delayed(play)(i) for i in range(n))
     print('勝率{:.2f}%'.format(sum(result)/n*100))
