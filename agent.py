@@ -49,18 +49,16 @@ def dfs(depth,board,valid_board,player,me):
             next_board=othello.Put(x,y,board,player)
             
             result=dfs(depth+1,next_board,None,1-player,me)
-
-            if player==me:#お互いに最善手を尽くすと仮定
-                results.append(result)
-                hand=i
-                        
+            results.append(result)
+            hand=i
+            
         if depth==0:
             return hand,max(results)
         else:            
             if player==me:
                 return max(results)
             else:
-                return min(results)+0.01*mean(results) #相手が最適に打つと全部-1になる場合、うっかりミスする確率を一緒に考えたい
+                return min(results)+0.01*mean(results) #相手が最適に打つと全部-1になる場合、うっかりミスする確率が高いやつを選ぶ
 
 def dfs2(depth,max_depth,board,valid_board,player,me):
     if depth==max_depth:
