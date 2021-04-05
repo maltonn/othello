@@ -4,7 +4,7 @@ from flask import *
 app = Flask(__name__)
 
 import othello
-import agent_algo
+from agent_algo import Algo
 
 @app.route('/start')
 def just_call():
@@ -36,7 +36,7 @@ def ai():
     if not valid:
         return jsonify({"msg": "pass"})
     
-    res=agent.Algo(board,valid_board,me)
+    res=Algo(board,valid_board,me)
     print(res//8,res%8)
 
     next_board=othello.Put(res%8,res//8,board,me)
