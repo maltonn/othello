@@ -1,6 +1,6 @@
 import joblib
 
-from agent import Algo
+from agent_algo import Algo
 import numpy as np
 
 class Board:
@@ -170,12 +170,11 @@ def RandomDecide(valid_board):
         if valid_board[y,x]:
             return y*8+x
 
-
 def play(game_no):
     me=0
     B=Board(8)
     while not B.done:
-        #print('player:',B.now_player)
+        if game_no==-1:print('player:',B.now_player)
         
         if B.now_player==me:
             res=Algo(B.board,B.valid_board,me)
@@ -183,8 +182,9 @@ def play(game_no):
             res=RandomDecide(B.valid_board)
         B.Put(res%8,res//8)
         
-        #B.Show()
-        #print('---------------------\n\n\n')
+        if game_no==-1:
+            B.Show()
+            print('---------------------\n\n\n')
 
         #print('\r','game{} : {}'.format(game_no,'|'+'#'*(B.stone_count)+' '*(64-B.stone_count))+'|',end="") #ゲージの初期値が4/60だが気にしない
 
@@ -197,6 +197,8 @@ def play(game_no):
 
 
 if __name__ == '__main__':
+    play(-1)
+    exit()
     n=500
     result = joblib.Parallel(n_jobs=-3,verbose=10)(joblib.delayed(play)(i) for i in range(n))
     print('勝率{:.2f}%'.format(sum(result)/n*100))

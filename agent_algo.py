@@ -2,6 +2,17 @@ import numpy as np
 
 import othello
 
+pos_rewards={
+        3:[0, 7, 63, 56],#角
+        1:[18, 21, 45, 42]+[2, 5, 23, 47, 61, 58, 40, 16]+[13, 22, 46, 53, 50, 41, 17, 10]+[59, 60, 39, 31, 4, 3, 24, 32],
+        0:[11, 12, 25, 33, 30, 38, 51, 52]+[19, 20, 29, 37, 44, 43, 34, 26],
+        -1:[49, 54, 14, 9]+[55, 62, 57, 48, 8, 1, 6, 15],
+}
+prs=[0]*64
+for key,lst in pos_rewards.items():
+    for val in lst:
+        prs[val]=key
+
 def argmax(L):
     idx=-1
     mx=-1000
@@ -51,7 +62,7 @@ def dfs(depth,board,valid_board,player,me):
             result=dfs(depth+1,next_board,None,1-player,me)
             results.append(result)
             hand=i
-            
+
         if depth==0:
             return hand,max(results)
         else:            
@@ -144,19 +155,6 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
     else:
         return min(rewards) #0.8*min(rewards)+0.2*mean(rewards)
 
-pos_rewards={
-        3:[0, 7, 63, 56],#角
-        1:[18, 21, 45, 42]+[2, 5, 23, 47, 61, 58, 40, 16]+[13, 22, 46, 53, 50, 41, 17, 10]+[59, 60, 39, 31, 4, 3, 24, 32],
-        0:[11, 12, 25, 33, 30, 38, 51, 52]+[19, 20, 29, 37, 44, 43, 34, 26],
-        -1:[49, 54, 14, 9]+[55, 62, 57, 48, 8, 1, 6, 15],
-}
-
-prs=[0]*64
-for key,lst in pos_rewards.items():
-    for val in lst:
-        prs[val]=key
-
-
 def Algo(board,valid_board,player):
     stone_count=np.sum(board)
     if stone_count>=57:
@@ -169,32 +167,4 @@ def Algo(board,valid_board,player):
 
     return hand #int
 
-import random
-def RandomDecide(_,valid_board,__):
-    while True:
-        r=random.randint(0,8**2-1)
-        y,x=r//8,r%8
-        if valid_board[y,x]:
-            return r
 
-
-
-"""
-import tensorflow as tf
-gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-for device in gpu_devices:
-    tf.config.experimental.set_memory_growth(device, True)
-from tensorflow.keras.models import load_model
-def ModelDecide(board,valid_board,player):
-    if player!=0:
-        raise Exception('player mus be 0')
-    
-    model = load_model('model.h5')
-    output_data = model.predict(board.reshape(1,8,8,2))
-    res = np.argmax(output_data[0])
-    y,x=res//8,res%8
-    if valid_board[y,x]:
-        return res
-    else:
-        return RandomDecide(board,valid_board,player)
-"""
