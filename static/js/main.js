@@ -2,6 +2,7 @@ const length=8
 var me=0
 const stone_color=['black','white']
 
+
 //set grid
 board_grid=document.getElementById('board_grid')
 for (i=0;i<length;i++){
@@ -56,10 +57,12 @@ if (now_playing==1){
 }
 
 //put stone
+
+hands_log=[]
 function Put(x,y,player){
     x=Number(x)
     y=Number(y)
-
+    
     if (now_playing!=player){
         Notify('AIが考えてます。ちょっと待ってね')
         return false
@@ -104,6 +107,7 @@ function Put(x,y,player){
         }
     }
     if (is_valid_action){
+        hands_log.push(x*8+y)
         if (now_playing==me){
             Notify('AI思考中...')
             f3()
@@ -134,8 +138,6 @@ function Reverse(x1,y1,x2,y2,dx,dy,player){
     nowx=Number(x1)
     nowy=Number(y1)
     f(nowx,nowy)
-    
-
     function f(nowx,nowy){
         nowx+=dx
         nowy+=dy
@@ -166,7 +168,7 @@ function Reverse(x1,y1,x2,y2,dx,dy,player){
 function Notify(str,mode){
     document.getElementById('notification_msg').innerText=str
 }
-Notify('あなたの番です')
+Notify('注）研究用に、打った手のデータは保存されます')
 
 
 function Board2Str(board){
@@ -227,6 +229,7 @@ function End(){
     }else{
         window.alert('試合終了！\n引き分けです')
     }
+    Send('https://sdyzrnc9i1.execute-api.us-east-2.amazonaws.com/default/light-api',{'sid':'othello','method':'add','hand':hands_log.join('-'),'result':user_stone>cpu_stone?'win':user_stone<cpu_stone?'lose':'tie','user_stone':user_stone,'cpu_stone':cpu_stone,'board':Board2Str(board),'user_color':stone_color[me]},null)
 }
 
 /*

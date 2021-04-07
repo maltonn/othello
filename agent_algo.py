@@ -6,7 +6,8 @@ pos_rewards={
         3:[0, 7, 63, 56],#角
         1:[18, 21, 45, 42]+[2, 5, 23, 47, 61, 58, 40, 16]+[13, 22, 46, 53, 50, 41, 17, 10]+[59, 60, 39, 31, 4, 3, 24, 32],
         0:[11, 12, 25, 33, 30, 38, 51, 52]+[19, 20, 29, 37, 44, 43, 34, 26],
-        -1:[49, 54, 14, 9]+[55, 62, 57, 48, 8, 1, 6, 15],
+        -1:[55, 62, 57, 48, 8, 1, 6, 15],
+        -3:[49, 54, 14, 9],
 }
 prs=[0]*64
 for key,lst in pos_rewards.items():
@@ -15,7 +16,7 @@ for key,lst in pos_rewards.items():
 
 def argmax(L):
     idx=-1
-    mx=-1000
+    mx=-10**9-1
     for i,v in enumerate(L):
         if v>mx:
             mx=v
@@ -115,9 +116,9 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
         my_stone=np.sum(board[:,:,me])
         oppose_stone=np.sum(board[:,:,1-me])
         if my_stone>oppose_stone:
-            return 100
+            return 10**9
         elif my_stone<oppose_stone:
-            return -100
+            return -10**9
         else:
             return 0
         
@@ -160,7 +161,7 @@ def Algo(board,valid_board,player):
     if stone_count>=57:
         hand,result=dfs(0,board,valid_board,player,player)
     else:
-        hand,reward=dfs2(0,2,board,valid_board,player,player)
+        hand,reward=dfs2(0,3,board,valid_board,player,player)
         #othello.Show(board)
         #print('reward:',reward)
 
