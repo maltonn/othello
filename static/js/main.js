@@ -162,7 +162,6 @@ function Reverse(x1,y1,x2,y2,dx,dy,player){
             stone.classList.add(stone_color[player])
         },100)
     }
-    
 }
 
 function Notify(str,mode){
