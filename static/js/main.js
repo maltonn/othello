@@ -69,7 +69,7 @@ function Put(x,y,player){
         Notify('AIが考えてます。ちょっと待ってね')
         return false
     }
-    if (board[y][x][1-player] || board[y][x][1-player]){
+    if (board[y][x][1-player] || board[y][x][player]){
         Notify('そこには置けません。')
         return false
     }
