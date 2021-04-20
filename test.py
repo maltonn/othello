@@ -1,6 +1,7 @@
 import joblib
 
 from agent_algo import Algo
+from agent_algo_old import Algo as Enemy
 import numpy as np
 
 class Board:
@@ -179,7 +180,7 @@ def play(game_no):
         if B.now_player==me:
             res=Algo(B.board,B.valid_board,me)
         else:
-            res=RandomDecide(B.valid_board)
+            res=Enemy(B.board,B.valid_board,me)#RandomDecide(B.valid_board)
         B.Put(res%8,res//8)
         
         if game_no==-1:

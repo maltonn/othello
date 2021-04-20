@@ -1,5 +1,5 @@
 import numpy as np
-import random
+
 import othello
 
 pos_rewards={
@@ -95,25 +95,7 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
                             continue
                         if (h-t-1<0 or certain_board_rot[h-t-1,t,p]) and (t-1<0 or certain_board_rot[h-t,t-1,p]) and (h-t-1<0 or t-1<0 or certain_board_rot[h-t-1,t-1,p]):
                             certain_board_rot[h-t,t,p]=1
-
-
-        tmp=[(0,None),(7,None),(None,0),(None,7)]
-        for a,b in tmp:
-            if a!=None:
-                tmp2=np.sum(board[a,:,:])==8
-            else:
-                tmp2=np.sum(board[:,b,:])==8
-
-            if tmp2:
-                for i in range(8):
-                    at=a if a!=None else i
-                    bt=b if b!=None else i
-                    if board[at,bt,0]:
-                        certain_board[at,bt,0]=1
-                    else:
-                        certain_board[at,bt,1]=1
-
-
+        
         for i in range(64):
             x=i%8
             y=i//8
@@ -122,7 +104,7 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
             elif certain_board[y,x,1-me]:
                 reward-=5
         
-        return reward+random.random()*4
+        return reward
 
     if depth!=0:#valid_boardが存在するのは初めの１回だけ
         valid,sv,valid_board=othello.CheckValid(board,player)

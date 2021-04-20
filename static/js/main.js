@@ -1,5 +1,5 @@
 const length=8
-var me=1
+var me=0
 const stone_color=['black','white']
 
 
@@ -51,7 +51,9 @@ tmp_func(length/2,length/2,1)
 tmp_func(length/2-1,length/2,0)
 tmp_func(length/2,length/2-1,0)
 
-Send('/ai', {'b':Board2Str(board)}, callback)
+if(me==1){
+    Send('/ai', {'b':Board2Str(board)}, callback)
+}
 
 
 if (now_playing==1){
