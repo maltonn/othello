@@ -1,5 +1,5 @@
 const length=8
-var me=0
+var me=1
 const stone_color=['black','white']
 
 
@@ -42,7 +42,6 @@ for(i=0;i<length;i++){
     board.push(tmp)
 }
 
-
 tmp_func=(x,y,player)=>{
     board[y][x][player]=1
     document.getElementById('stone-'+y+'-'+x).classList.add(stone_color[player])
@@ -51,6 +50,9 @@ tmp_func(length/2-1,length/2-1,1)
 tmp_func(length/2,length/2,1)
 tmp_func(length/2-1,length/2,0)
 tmp_func(length/2,length/2-1,0)
+
+Send('/ai', {'b':Board2Str(board)}, callback)
+
 
 if (now_playing==1){
     Send('/ai', {'b':Board2Str(board)}, callback)
