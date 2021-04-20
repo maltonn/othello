@@ -75,4 +75,12 @@ body > h1 {
   border: 3px solid black;
 }
 
+#hidden_btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+}
+
 /*# sourceMappingURL=style.css.map */
