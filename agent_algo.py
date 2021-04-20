@@ -3,7 +3,7 @@ import numpy as np
 import othello
 
 pos_rewards={
-        3:[0, 7, 63, 56],#角
+        100000:[0, 7, 63, 56],#角
         1:[18, 21, 45, 42]+[2, 5, 23, 47, 61, 58, 40, 16]+[13, 22, 46, 53, 50, 41, 17, 10]+[59, 60, 39, 31, 4, 3, 24, 32],
         0:[11, 12, 25, 33, 30, 38, 51, 52]+[19, 20, 29, 37, 44, 43, 34, 26],
         -1:[55, 62, 57, 48, 8, 1, 6, 15],
@@ -161,9 +161,11 @@ def Algo(board,valid_board,player):
     if stone_count>=57:
         hand,result=dfs(0,board,valid_board,player,player)
     else:
-        hand,reward=dfs2(0,3,board,valid_board,player,player)
+        hand,reward=dfs2(0,4,board,valid_board,player,player)
         #othello.Show(board)
         #print('reward:',reward)
 
 
     return hand #int
+
+
