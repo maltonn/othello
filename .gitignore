@@ -1,0 +1,8 @@
+static/memo.txt
+static/.sass-cache
+static/watch
+
+agent_ML.py
+o.py
+replay.py
+test.py
