@@ -18,6 +18,7 @@ for(var c of cookiesArray){ //一つ一つ取り出して
 }
 
 if(!user_id){
+    console.log('renew user_id')
     user_id=Array.from(Array(N)).map(()=>S[Math.floor(Math.random()*S.length)]).join('')
     document.cookie="uid="+user_id
 }
@@ -263,6 +264,7 @@ function End() {
         'battle_id':battle_id,
         'user_id':user_id,
         'time':new Date().getTime(),
+        'ver':'1.1.2',
     }
     Send('https://sdyzrnc9i1.execute-api.us-east-2.amazonaws.com/default/light-api', board_info, null)
 }
