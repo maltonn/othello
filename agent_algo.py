@@ -1,6 +1,7 @@
 import numpy as np
 import random
-import othello
+from othello import CheckValid,Put
+import time
 
 pos_rewards={
         5:[0, 7, 63, 56],#角
@@ -28,7 +29,7 @@ def mean(L):
 
 def dfs(depth,board,valid_board,player,me):
     if depth!=0:#valid_boardが存在するのは初めの１回だけ
-        valid,sv,valid_board=othello.CheckValid(board,1-player)
+        valid,sv,valid_board=CheckValid(board,1-player)
     else:
         valid=True
         sv=True
@@ -58,7 +59,7 @@ def dfs(depth,board,valid_board,player,me):
             if not valid_board[y,x]:
                 continue
                 
-            next_board=othello.Put(x,y,board,player)
+            next_board=Put(x,y,board,player)
             
             result=dfs(depth+1,next_board,None,1-player,me)
             results.append(result)
@@ -125,7 +126,7 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
         return reward+random.random()*4
 
     if depth!=0:#valid_boardが存在するのは初めの１回だけ
-        valid,sv,valid_board=othello.CheckValid(board,player)
+        valid,sv,valid_board=CheckValid(board,player)
     else:
         valid=True
         sv=True
@@ -149,16 +150,13 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
             hands=[]
         rewards=[]
 
-        if np.sum(valid_board)>=16:
-            max_depth=3
-
         for i in range(64):
             y=i//8
             x=i%8
             if not valid_board[y,x]:
                 continue
 
-            next_board=othello.Put(x,y,board,player)
+            next_board=Put(x,y,board,player)
             reward=dfs2(depth+1,max_depth,next_board,None,1-player,me)
 
             if depth==0:
@@ -176,10 +174,16 @@ def dfs2(depth,max_depth,board,valid_board,player,me):
 
 def Algo(board,valid_board,player):
     stone_count=np.sum(board)
-    if stone_count>=57:
+    valid_count=np.sum(valid_board)
+    if stone_count>=57:#全探索
         hand,result=dfs(0,board,valid_board,player,player)
     else:
-        hand,reward=dfs2(0,3,board,valid_board,player,player)
+        start=time.time()
+        for max_depth in range(3,10):
+            hand,reward=dfs2(0,max_depth,board,valid_board,player,player)
+            if time.time()-start>=0.3:
+                break
+            
         #othello.Show(board)
         #print('reward:',reward)
 
